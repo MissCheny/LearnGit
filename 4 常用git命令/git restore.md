@@ -1,0 +1,67 @@
+# <center>`git restore`</center>
+
+`git restore` 用于撤销工作区或暂存区的修改，将文件恢复到指定版本状态。
+
+
+### 场景1：撤销工作区修改（未 `git add`）
+
+<table><tr><td style='vertical-align:top; width:240px;'>
+
+```bash
+$ git restore file.txt
+```
+
+丢弃工作区修改，恢复为最新提交版本
+
+</td><td style='vertical-align:top;'>
+
+**Q：若没有 `git add` 直接在工作区中修改文件就好啦，为什么还需要用 `git restore file.txt`？**
+
+   A: 若误删了文件中的关键代码，且修改分散在多个位置，手动删除容易遗漏或出错，`git restore` 则可以一键恢复到最近一次 `git commit` 的状态，（无需记忆原始内容）。  
+
+</td></tr></table>
+
+---
+
+### 场景2：撤销暂存区修改（已 `git add`）
+将文件从暂存区撤回到工作区（保留修改）  
+
+<table><tr><td style='vertical-align:top;'>
+
+```bash
+$ git restore --staged file.txt
+$ git restore -S file.txt   # `-S` 等价于 `--staged`
+```
+`-S` 等价于 `--staged`
+
+</td><td style='vertical-align:top;'>
+  
+注意这里的 `-S` 而不是 `-s`
+- `--staged` 的缩写是 `-S`（大写 S）  
+- `--source` 的缩写是 `-s`（小写 s）  
+
+</td></tr></table>
+
+### 场景3：恢复文件到指定提交版本
+```bash
+# 从某个历史提交恢复文件（如恢复到前一次提交）
+git restore --source=HEAD~1 file.txt
+```
+
+## 三、注意事项
+1. **数据丢失风险**：`git restore` 会直接覆盖文件，未提交的修改无法恢复。
+2. 操作前建议用 `git status` 确认文件状态。
+3. 使用 `--dry-run` 选项可预览恢复效果（不实际执行）：
+   ```bash
+   git restore --dry-run file.txt
+   ```
+
+
+### 总结流程图
+```
+工作区修改 → git restore file.txt（撤销工作区改动）
+   ↓
+git add → git restore -S file.txt（撤销暂存）
+   ↓
+git commit → git reset HEAD~1（撤销提交）
+```
